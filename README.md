@@ -1,5 +1,7 @@
 # OpenDome
 
+![alt text](https://raw.githubusercontent.com/jjwallace/opendome/master/src/assets/img/iso-dome.png)
+
 OpenDome.org Website and Geo-Dome Calculator.
 
 Calculator:
