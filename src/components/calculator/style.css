@@ -44,3 +44,13 @@
 .infoPanel{
   
 }
+.panel {
+  margin: 10px;
+  color: #fff;
+  padding: 5px;
+  font-size: 18px;
+  text-align: right;
+  text-shadow: 1px 2px #000000;
+  font-family: 'Roboto', sans-serif;
+  width: 340px;
+}

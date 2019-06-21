@@ -17,25 +17,19 @@ import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import css from './style.css';
 
 //ASSETS
-import bolts from './img/bolt.png';
 import dome from './img/iso-dome.png';
-import domeTop from './img/iso-dome-top.png';
-import wood from './img/wood.png';
 
 var totalMaterial = 0;
 
-export default class InfoPanel extends React.Component {
+export default class Title extends React.Component {
 	constructor(props) {
 		super(props);
 	}
 	
 	render() {
 		return (
-			<div className="infoPanel lblCalAll">
-                <img src={bolts} alt="Bolts" width="100%"/>
+			<div className="infoPanel panel">
 				<img src={dome} alt="Bolts" width="100%"/>
-				<img src={domeTop} alt="Bolts" width="100%"/>
-				<img src={wood} alt="Bolts"/>
 			</div>
 		);
 	}

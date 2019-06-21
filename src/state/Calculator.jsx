@@ -15,6 +15,7 @@ import AutoResponsive from 'autoresponsive-react';
 //COMPONENTS
 import DomeCalculator from './../components/calculator/DomeCalculator';
 import InfoPanel from './../components/calculator/InfoPanel';
+import Title from './../components/calculator/Title';
 
 //STYLE
 //import css from './style.css';
@@ -29,8 +30,9 @@ export default class Calculator extends React.Component {
 	render() {
 		return (
 			<div className="main-content">
-                    <DomeCalculator/>
-                    <InfoPanel/>
+				<Title/>
+        <DomeCalculator/>
+        <InfoPanel/>
 			</div>
 		);
 	}
