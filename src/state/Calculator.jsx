@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
 import { Container, Row, Col } from 'reactstrap';
-
 import AutoResponsive from 'autoresponsive-react';
 
 //STORE

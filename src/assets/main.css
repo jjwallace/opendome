@@ -78,3 +78,7 @@ body {
   text-align: left;
   background-color: #171941; 
 }
+
+.app {
+  margin: 0;
+}

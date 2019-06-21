@@ -28,13 +28,12 @@ export default class InfoPanel extends React.Component {
 	constructor(props) {
 		super(props);
 	}
-	
+
 	render() {
 		return (
-			<div className="infoPanel lblCalAll">
+			<div className="infoPanel panel">
                 <img src={bolts} alt="Bolts" width="100%"/>
-				<img src={dome} alt="Bolts" width="100%"/>
-				<img src={domeTop} alt="Bolts" width="100%"/>
+				<img src={domeTop} alt="Dome Top View" width="100%"/>
 				<img src={wood} alt="Bolts"/>
 			</div>
 		);

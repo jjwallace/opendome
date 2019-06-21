@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "react": "^16.8.6",
+    "react-burger-menu": "^2.6.10",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.1",
     "reactstrap": "^8.0.0",

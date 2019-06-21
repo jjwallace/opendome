@@ -2,6 +2,6 @@ import React from 'react';
 import Root from './Root';
 
 const App = ({ title }) =>
-  <div><Root/></div>;
+  <div className="app"><Root/></div>;
 
 export default App;
