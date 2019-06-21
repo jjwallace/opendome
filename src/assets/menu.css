@@ -75,9 +75,12 @@
 
   .bm-item{
     margin: 0;
-    font-family: "Poppins", sans-serif;
-    font-size: 0.875rem;
-    font-weight: 400;
+    font-size: 18px;
+    text-align: right;
+    text-shadow: 1px 2px #000000;
+    font-family: 'Roboto', sans-serif;
+
+    font-weight: 700;
     line-height: 1.5;
     color: #b8b7ad;;
     text-align: left;
@@ -87,10 +90,9 @@
     /* Our sidebar item styling */
     text-decoration: none;
     margin-bottom: 10px;
-    color: #d1d1d1;
     transition: color 0.2s;
   }
 
   .bm-item:hover {
-    color: white;
+    color: rgb(54, 238, 9);
   }
