@@ -202,7 +202,7 @@ export const CORE_PAGES: WikiPage[] = [
     related: ['chord-charts'],
     title: 'Compare domes',
     teaser: 'Every dome in the calculator, side by side.',
-    group: 'Reference',
+    group: 'Build',
     art: () => `<span class="swatch-art">${STRUT_COLORS.slice(0, 9).map((c) => `<i style="background:${c}"></i>`).join('')}</span>`,
     body: ({ geometries }) => `
       <table class="compare">

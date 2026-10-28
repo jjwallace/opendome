@@ -559,6 +559,74 @@ footer a {
   text-decoration: none;
 }
 
+/* Planning cards, tucked into a closed "More info" drawer */
+
+.more-info {
+  margin-top: 20px;
+  border-radius: 6px;
+  border: 1px dashed #444;
+  transition: border-color 0.2s;
+}
+
+.more-info[open] {
+  border-style: solid;
+  border-color: #3a3a3a;
+  padding-bottom: 20px;
+}
+
+.more-info summary {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 14px 20px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.more-info summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-info summary::before {
+  content: '+';
+  align-self: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #333;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 21px;
+  text-align: center;
+  transition: transform 0.25s;
+}
+
+.more-info[open] summary::before {
+  transform: rotate(45deg);
+}
+
+.more-title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.more-blurb {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.more-info .details {
+  margin: 0 20px;
+}
+
+.weight-form {
+  margin-top: 18px;
+}
+
+.exports {
+  flex-wrap: wrap;
+}
+
 /* Planning cards */
 
 .card-head {
@@ -1055,6 +1123,68 @@ footer a {
   display: block;
 }
 
+/* Wiki "More info": a compact list instead of more cards. */
+
+.wiki-more {
+  margin-top: 40px;
+}
+
+.more-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px 28px;
+  padding: 4px 20px 8px;
+}
+
+.more-lists h4 {
+  margin: 12px 0 6px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9a9a9a;
+}
+
+.more-lists a {
+  display: block;
+  padding: 7px 10px;
+  margin: 0 -10px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.more-lists a:hover {
+  background: #2e2e2e;
+}
+
+.more-lists b {
+  display: block;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.more-lists span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.nav-group h4 {
+  margin: 16px 0 6px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.nav-more {
+  margin-top: 14px;
+  padding-top: 6px;
+  border-top: 1px solid #333;
+}
+
 /* Wiki index: one accordion row per section. */
 
 .wiki-groups {
@@ -1522,11 +1652,20 @@ footer a {
     flex-wrap: wrap;
     gap: 6px;
   }
-  .nav-group summary {
+  .nav-group h4 {
     display: none;
   }
-  .nav-group:not([open]) {
-    display: none;
+  .nav-more {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .nav-more summary {
+    margin: 0;
+    padding: 4px 10px;
+    border: 1px dashed #555;
+    border-radius: 14px;
+    letter-spacing: 0.04em;
   }
   .wiki-search {
     width: 100%;
@@ -1564,6 +1703,12 @@ footer a {
 }
 
 @media (max-width: 640px) {
+  .more-blurb {
+    display: none;
+  }
+  .more-info .details {
+    margin: 0 12px;
+  }
   .brand span {
     display: none;
   }
