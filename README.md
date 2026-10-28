@@ -28,6 +28,13 @@ bun run build      # static site in dist/
 To add a dome, add an entry to `src/domes.ts`: base polyhedron, frequency and nominal
 height fraction.
 
+## Pages
+
+- `#/calc/<dome>`: the calculator (the main page).
+- `#/wiki` and `#/wiki/<page>`: the Dome Wiki (frequency, height, struts, assembly, hubs,
+  Buckminster Fuller, dome history, fullerenes, and a comparison table). Content lives in
+  `src/wiki.ts`; photo credits for the Wikimedia Commons images are in `src/wiki-credits.json`.
+
 ## How it works
 
 - `src/geodesic.ts` subdivides each face of the base solid (class I), projects the points to

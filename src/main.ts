@@ -13,6 +13,7 @@ import {
 } from './calc';
 import { DOMES } from './domes';
 import { type DomeGeometry, buildDome } from './geodesic';
+import { Wiki } from './wiki';
 import { MainView, ThumbnailRenderer, type Timeline } from './scene';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -22,19 +23,42 @@ const geometries = DOMES.map(buildDome).sort((a, b) => a.edges.length - b.edges.
 const indexOf = (id: string) => geometries.findIndex((g) => g.spec.id === id);
 
 const state = {
-  index: Math.max(0, indexOf(location.hash.slice(1))),
+  index: indexOf('3v-5-8'),
   unit: 'ft' as Unit,
   /** Sphere radius in the current unit. The original calculator opened on a 24 ft dome. */
   radius: 12,
   hover: -1,
 };
-if (!location.hash) state.index = indexOf('3v-5-8');
+
+// ---------------------------------------------------------------- routes
+
+type Route = { page: 'calc'; id?: string } | { page: 'wiki'; slug?: string };
+
+/** `#/calc/<dome>`, `#/wiki/<page>`; a bare `#<dome>` is the old calculator link. */
+function parseRoute(hash: string): Route {
+  const [page, arg] = hash.replace(/^#\/?/, '').split('/');
+  if (page === 'wiki' || page === 'info') return { page: 'wiki', slug: arg };
+  if (page === 'calc' || page === '') return { page: 'calc', id: arg };
+  return { page: 'calc', id: page };
+}
+
+const initialRoute = parseRoute(location.hash);
+if (initialRoute.page === 'calc' && initialRoute.id && indexOf(initialRoute.id) >= 0) state.index = indexOf(initialRoute.id);
 
 const current = () => geometries[state.index];
 
 // ---------------------------------------------------------------- preview boxes
 
-const thumbs = new ThumbnailRenderer(240, 180);
+/** The 3D views need WebGL; without it the calculator and wiki still work. */
+function tryWebGL<T>(make: () => T): T | undefined {
+  try {
+    return make();
+  } catch {
+    return undefined;
+  }
+}
+
+const thumbs = tryWebGL(() => new ThumbnailRenderer(240, 180));
 const picker = $('picker');
 const boxes = geometries.map((g, i) => {
   const box = document.createElement('button');
@@ -51,18 +75,19 @@ const boxes = geometries.map((g, i) => {
   box.addEventListener('pointerenter', () => (state.hover = i));
   box.addEventListener('pointerleave', () => (state.hover = -1));
   picker.appendChild(box);
-  thumbs.add(canvas, g);
+  thumbs?.add(canvas, g);
   return box;
 });
 
 // ---------------------------------------------------------------- main view
 
-const view = new MainView($('viewer'));
+const view = thumbs && tryWebGL(() => new MainView($('viewer')));
+if (!view) $('viewer').innerHTML = '<p class="no-webgl">3D preview needs WebGL, which this browser has turned off.</p>';
 $<HTMLInputElement>('opt-rotate').addEventListener('change', (e) => {
-  view.autoRotate = (e.target as HTMLInputElement).checked;
+  if (view) view.autoRotate = (e.target as HTMLInputElement).checked;
 });
 $<HTMLInputElement>('opt-guides').addEventListener('change', (e) => {
-  view.setGuides((e.target as HTMLInputElement).checked);
+  view?.setGuides((e.target as HTMLInputElement).checked);
 });
 
 // ---------------------------------------------------------------- calculator pills
@@ -314,10 +339,15 @@ function select(i: number) {
   state.index = i;
   boxes.forEach((b, j) => b.classList.toggle('on', j === i));
   boxes[i].scrollIntoView({ block: 'nearest', inline: 'nearest' });
-  history.replaceState(null, '', `#${g.spec.id}`);
+  if (currentPage === 'calc') history.replaceState(null, '', `#/calc/${g.spec.id}`);
   if (!first) leavePills();
 
-  const tl = view.show(g);
+  const tl: Timeline = view?.show(g) ?? {
+    enter: 0,
+    struts: g.strutTypes.map((_, t) => 0.1 + t * 0.14),
+    guides: { C: 0.5, D: 0.6, R: 0.7, H: 0.8, A: 0.9 },
+    done: 1,
+  };
   later(tl.enter, () => {
     $('dome-name').textContent = g.spec.name;
     $('dome-blurb').textContent = g.spec.blurb;
@@ -365,12 +395,88 @@ for (const b of document.querySelectorAll<HTMLButtonElement>('.units button')) {
 }
 
 window.addEventListener('keydown', (e) => {
-  if (e.target instanceof HTMLInputElement) return;
+  if (e.target instanceof HTMLInputElement || currentPage !== 'calc') return;
   if (e.key === 'ArrowRight') select((state.index + 1) % geometries.length);
   if (e.key === 'ArrowLeft') select((state.index - 1 + geometries.length) % geometries.length);
 });
 
-select(state.index);
+const pages = { calc: $('page-calc'), wiki: $('page-wiki') };
+const ORDER = ['calc', 'wiki'] as const;
+let currentPage: Route['page'] = initialRoute.page;
+let wiki: Wiki | undefined;
+let routeGen = 0;
+
+function moveTabInk() {
+  const tab = document.querySelector<HTMLElement>(`.tabs a[data-route="${currentPage}"]`);
+  const ink = document.querySelector<HTMLElement>('.tab-ink');
+  if (!tab || !ink) return;
+  for (const a of document.querySelectorAll<HTMLElement>('.tabs a')) a.classList.toggle('on', a === tab);
+  ink.style.width = `${tab.offsetWidth}px`;
+  ink.style.transform = `translateX(${tab.offsetLeft}px)`;
+  $('units').classList.toggle('off', currentPage !== 'calc');
+}
+
+function ensureWiki() {
+  wiki ??= new Wiki(pages.wiki, geometries);
+  return wiki;
+}
+
+function arrive(route: Route) {
+  if (route.page === 'calc') {
+    const i = route.id ? indexOf(route.id) : -1;
+    // Coming back to the calculator replays the assembly.
+    select(i >= 0 ? i : state.index);
+  } else {
+    ensureWiki().show(route.slug, false);
+  }
+}
+
+/** Slide pages in the direction of the tab order: the old page drifts out, the new one glides in. */
+async function go(route: Route) {
+  const gen = ++routeGen;
+  if (route.page === currentPage) {
+    if (route.page === 'calc') {
+      const i = route.id ? indexOf(route.id) : -1;
+      if (i >= 0 && i !== state.index) select(i);
+    } else ensureWiki().show(route.slug, true);
+    return;
+  }
+  const from = pages[currentPage];
+  const to = pages[route.page];
+  const dir = ORDER.indexOf(route.page) > ORDER.indexOf(currentPage) ? 1 : -1;
+  currentPage = route.page;
+  moveTabInk();
+  if (route.page === 'wiki') ensureWiki();
+
+  await from
+    .animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-48 * dir}px) scale(.985)` }], {
+      duration: 200,
+      easing: 'cubic-bezier(.5,0,.75,0)',
+      fill: 'forwards',
+    })
+    .finished.catch(() => undefined);
+  if (gen !== routeGen) return;
+  from.hidden = true;
+  from.getAnimations().forEach((a) => a.cancel());
+  to.hidden = false;
+  window.scrollTo({ top: 0 });
+  to.animate([{ opacity: 0, transform: `translateX(${64 * dir}px)` }, { opacity: 1, transform: 'none' }], {
+    duration: 460,
+    easing: 'cubic-bezier(.2,.9,.3,1)',
+  });
+  if (route.page === 'calc') history.replaceState(null, '', `#/calc/${current().spec.id}`);
+  arrive(route);
+}
+
+window.addEventListener('hashchange', () => go(parseRoute(location.hash)));
+window.addEventListener('resize', moveTabInk);
+
+pages.calc.hidden = currentPage !== 'calc';
+pages.wiki.hidden = currentPage !== 'wiki';
+if (initialRoute.page === 'wiki') ensureWiki().show(initialRoute.slug, false);
+else select(state.index);
+moveTabInk();
+document.fonts?.ready.then(moveTabInk);
 
 let last = performance.now();
 function frame(now: number) {
@@ -398,8 +504,10 @@ function frame(now: number) {
     if (entry.pill.count) entry.label.textContent = `${Math.round(entry.pill.count * e)} ×`;
     if (k >= 1) countUps.delete(key);
   }
-  thumbs.render(dt, (i) => i === state.index || i === state.hover);
-  view.render();
+  if (!pages.calc.hidden) {
+    thumbs?.render(dt, (i) => i === state.index || i === state.hover);
+    view?.render();
+  }
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
