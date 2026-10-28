@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenDome Calculator</title>
+    <link rel="icon" href="/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#">
+        <img src="/logo.png" alt="" />
+        <span><b>OpenDome</b> Calculator</span>
+      </a>
+      <div class="units" role="group" aria-label="Units">
+        <button data-unit="ft" class="on">ft</button>
+        <button data-unit="m">m</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="picker" id="picker" aria-label="Dome types"></section>
+
+      <section class="stage">
+        <div class="card viewer">
+          <div class="viewer-head">
+            <div>
+              <h1 id="dome-name"></h1>
+              <p id="dome-blurb"></p>
+            </div>
+            <div class="toggles">
+              <label><input type="checkbox" id="opt-rotate" checked /> Rotate</label>
+              <label><input type="checkbox" id="opt-guides" checked /> Guides</label>
+            </div>
+          </div>
+          <div class="canvas-host" id="viewer"></div>
+          <div class="badges" id="badges"></div>
+        </div>
+
+        <div class="side">
+          <div class="card calc-card">
+            <h2>Struts</h2>
+            <form id="struts" class="pills" autocomplete="off"></form>
+          </div>
+          <div class="card calc-card">
+            <h2>Dimensions</h2>
+            <form id="dims" class="pills" autocomplete="off"></form>
+          </div>
+        </div>
+      </section>
+
+      <section class="details">
+        <div class="card light">
+          <h3>Cut list</h3>
+          <table class="cutlist">
+            <thead><tr><th></th><th>Qty</th><th>Chord factor</th><th>Length</th><th>Precise</th></tr></thead>
+            <tbody id="cutlist"></tbody>
+            <tfoot id="cutlist-total"></tfoot>
+          </table>
+        </div>
+
+        <div class="card light">
+          <h3>Hubs &amp; hardware</h3>
+          <div class="hardware" id="hardware"></div>
+          <ul class="hubs" id="hubs"></ul>
+        </div>
+
+        <div class="card light">
+          <h3>Materials</h3>
+          <p class="muted">Costs vary by location.</p>
+          <form class="mat-form" id="materials" autocomplete="off">
+            <label>Stock length <span><input id="m-stock" inputmode="decimal" /> <i data-u></i></span></label>
+            <label>Saw kerf <span><input id="m-kerf" inputmode="decimal" /> <i data-u-small></i></span></label>
+            <label>Price per stick <span>$ <input id="m-price" inputmode="decimal" value="8.50" /></span></label>
+            <label>Hub hardware, each <span>$ <input id="m-hub" inputmode="decimal" value="1.25" /></span></label>
+            <label><span>Cover, per <i data-u2></i></span> <span>$ <input id="m-cover" inputmode="decimal" value="0.60" /></span></label>
+          </form>
+          <dl class="totals" id="mat-out"></dl>
+        </div>
+      </section>
+    </main>
+
+    <footer>Geodesic geometry built per dome: class I subdivision, projected to the sphere, cut on the nearest clean hub layer.</footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
