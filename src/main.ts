@@ -269,7 +269,6 @@ function update(editing?: string) {
        <dt>Struts</dt><dd>$${fixed(strutCost)}</dd>
        <dt>Hub hardware</dt><dd>$${fixed(hubCost)}</dd>
        <dt>Cover (${fixed(surface, 0)} ${u}²)</dt><dd>$${fixed(coverCost)}</dd>
-       <dt>Frame weight</dt><dd>${frameWeight()}</dd>
        <dt class="grand">Total</dt><dd class="grand">$${fixed(strutCost + hubCost + coverCost)}</dd>`
     : `<dt>Longest strut is longer than the stock length.</dt><dd></dd>`;
 
@@ -279,6 +278,7 @@ function update(editing?: string) {
     const lb = feet * m.lbPerFt;
     return u === 'ft' ? `${fixed(lb, 0)} lb` : `${fixed(lb * 0.4536, 0)} kg`;
   }
+  $('weight-out').innerHTML = `<dt>Frame weight</dt><dd>${frameWeight()}</dd><dt>Total strut length</dt><dd>${fixed(totalLength, 1)} ${u}</dd>`;
   renderPlanning(g, r);
 }
 
@@ -364,22 +364,22 @@ function arrivePill(key: string, delay: number) {
   const ms = delay * 1000;
   const spring = 'cubic-bezier(.2,1.5,.45,1)';
   entry.label.animate([{ opacity: 0, transform: 'translateX(-28px)' }, { opacity: 1, transform: 'none' }], {
-    duration: 520,
+    duration: 440,
     delay: ms,
     easing: spring,
     fill: 'backwards',
   });
   entry.wrap.animate([{ opacity: 0, transform: 'translateX(36px) scale(.8)' }, { opacity: 1, transform: 'none' }], {
-    duration: 560,
+    duration: 480,
     delay: ms + 40,
     easing: spring,
     fill: 'backwards',
   });
   entry.input.animate(
     [{ boxShadow: `0 0 0 0 ${entry.pill.bg}` }, { boxShadow: `0 0 0 10px ${entry.pill.bg}00` }],
-    { duration: 650, delay: ms + 560, easing: 'ease-out' },
+    { duration: 650, delay: ms + 480, easing: 'ease-out' },
   );
-  countUps.set(key, { at: performance.now() + ms + 40, dur: 700 });
+  countUps.set(key, { at: performance.now() + ms + 40, dur: 550 });
   entry.input.value = fixed(0);
   if (entry.pill.count) entry.label.textContent = '0 ×';
 }
@@ -397,7 +397,7 @@ function arrivePills(g: DomeGeometry, tl: Timeline) {
     prev = Math.max(cue.at, prev + GAP);
     arrivePill(cue.key, prev);
   }
-  for (const key of ['C', 'D', 'R', 'H', 'A'] as const) arrivePill(key, tl.guides[key]);
+  for (const key of ['D', 'R', 'H', 'C', 'A'] as const) arrivePill(key, tl.guides[key]);
 }
 
 function select(i: number) {

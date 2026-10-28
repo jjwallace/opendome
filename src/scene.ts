@@ -222,8 +222,9 @@ class AssembledDome {
     const struts = g.strutTypes.map((_, t) =>
       Math.min(...g.edges.map((e, i) => (e[2] === t ? landed(i) : Number.POSITIVE_INFINITY))),
     );
-    const guides = { C: last + 0.05, D: last + 0.3, R: last + 0.55, H: last + 0.78, A: last + 1.0 };
-    this.timeline = { struts, guides, done: guides.A + GUIDE_DRAW };
+    // Dimensions draw in early, while struts are still arriving, at the same pace on every dome.
+    const guides = { D: 0.35, R: 0.5, H: 0.65, C: 0.8, A: 0.95 };
+    this.timeline = { struts, guides, done: Math.max(last, guides.A + GUIDE_DRAW) };
     this.buildGuides(g, guides);
     this.write();
   }

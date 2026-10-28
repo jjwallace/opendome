@@ -4,33 +4,30 @@ import credits from './wiki-credits.json';
 import { EXTRA_PAGES } from './wiki-extra';
 import type { WikiGroup, WikiPage } from './wiki-kit';
 
-const GROUPS: { id: WikiGroup; blurb: string }[] = [
-  { id: 'Learn', blurb: 'How domes work: frequency, height, struts and the geometry behind them.' },
-  { id: 'Build', blurb: 'From cut list to standing dome: struts, hubs, covers, anchoring and doors.' },
-  { id: 'Dome types', blurb: 'Greenhouses, pool domes, glamping, radomes and other variations.' },
-  { id: 'History', blurb: 'Fuller, the great domes, the counterculture, and the molecules named after him.' },
-  { id: 'Reference', blurb: 'Glossary, chord factor charts, comparisons and file exports.' },
-];
+/** The main wiki: the essentials, shown up front. */
+const MAIN_GROUPS: WikiGroup[] = ['Learn', 'Build', 'History'];
+/** Deeper pages, kept out of the way in one closed "More info" section. */
+const MORE_GROUPS: WikiGroup[] = ['Learn', 'Build', 'Dome types', 'History', 'Reference'];
 
-/** Pages in reading order: each group's core pages first, then the newer ones. */
-const PAGES: WikiPage[] = GROUPS.flatMap((g) => [...CORE_PAGES, ...EXTRA_PAGES].filter((p) => p.group === g.id));
+const MAIN = MAIN_GROUPS.flatMap((g) => CORE_PAGES.filter((p) => p.group === g));
+const MORE = MORE_GROUPS.flatMap((g) => EXTRA_PAGES.filter((p) => p.group === g));
+/** Reading order for previous / next. */
+const PAGES: WikiPage[] = [...MAIN, ...MORE];
 const pageBySlug = (slug?: string) => PAGES.find((p) => p.slug === slug);
-const inGroup = (g: WikiGroup) => PAGES.filter((p) => p.group === g);
+const isMore = (p?: WikiPage) => !!p && MORE.includes(p);
+const MORE_LABEL: Partial<Record<WikiGroup, string>> = { Learn: 'Understanding', Build: 'Building', History: 'Stories' };
 
-/** Which index groups are open, remembered per viewer. The first group starts open. */
-const OPEN_KEY = 'wiki-open-groups';
-function readOpen(): Set<string> {
+const OPEN_KEY = 'wiki-more-open';
+function readMoreOpen(): boolean {
   try {
-    const raw = localStorage.getItem(OPEN_KEY);
-    if (raw) return new Set(JSON.parse(raw));
+    return localStorage.getItem(OPEN_KEY) === '1';
   } catch {
-    // storage unavailable: fall through to the default
+    return false;
   }
-  return new Set([GROUPS[0].id]);
 }
-function writeOpen(open: Set<string>) {
+function writeMoreOpen(open: boolean) {
   try {
-    localStorage.setItem(OPEN_KEY, JSON.stringify([...open]));
+    localStorage.setItem(OPEN_KEY, open ? '1' : '0');
   } catch {
     // not persisted; the page still works
   }
@@ -41,7 +38,7 @@ export class Wiki {
   private nav: HTMLElement;
   private slug?: string;
   private navGen = 0;
-  private openGroups = readOpen();
+  private moreOpen = readMoreOpen();
 
   constructor(private host: HTMLElement, private geometries: DomeGeometry[]) {
     host.innerHTML = `
@@ -50,15 +47,14 @@ export class Wiki {
           <a class="wiki-home" href="#/wiki">Dome Wiki</a>
           <input class="wiki-search" type="search" placeholder="Search the wiki…" aria-label="Search the wiki" />
           <div class="wiki-nav-groups">
-            ${GROUPS.map(
-              (g) => `<details class="nav-group" data-group="${g.id}">
-                <summary>${g.id}<span>${inGroup(g.id).length}</span></summary>
-                ${inGroup(g.id)
-                  .map((p) => `<a href="#/wiki/${p.slug}" data-slug="${p.slug}">${p.title}</a>`)
-                  .join('')}
-              </details>`,
+            ${MAIN_GROUPS.map(
+              (g) => `<div class="nav-group" data-group="${g}"><h4>${g}</h4>${MAIN.filter((p) => p.group === g)
+                .map((p) => `<a href="#/wiki/${p.slug}" data-slug="${p.slug}">${p.title}</a>`)
+                .join('')}</div>`,
             ).join('')}
-            <details class="nav-group" data-group="About"><summary>About<span>1</span></summary>
+            <details class="nav-group nav-more" data-group="more">
+              <summary>More info<span>${MORE.length}</span></summary>
+              ${MORE.map((p) => `<a href="#/wiki/${p.slug}" data-slug="${p.slug}">${p.title}</a>`).join('')}
               <a href="#/wiki/credits" data-slug="credits">Image credits</a>
             </details>
           </div>
@@ -75,7 +71,7 @@ export class Wiki {
   private search(text: string) {
     const q = text.trim().toLowerCase();
     let any = false;
-    for (const group of this.nav.querySelectorAll<HTMLDetailsElement>('.nav-group')) {
+    for (const group of this.nav.querySelectorAll<HTMLElement>('.nav-group')) {
       let hits = 0;
       for (const a of group.querySelectorAll<HTMLElement>('a[data-slug]')) {
         const p = pageBySlug(a.dataset.slug);
@@ -85,7 +81,7 @@ export class Wiki {
         if (hit) hits++;
       }
       group.hidden = hits === 0;
-      if (q) group.open = hits > 0;
+      if (q && group instanceof HTMLDetailsElement) group.open = hits > 0;
       any ||= hits > 0;
     }
     if (!q) this.markNav(this.slug);
@@ -112,29 +108,34 @@ export class Wiki {
     const page = pageBySlug(slug);
     if (!page) {
       return `<header class="wiki-head"><h1>Dome Wiki</h1><p class="sub">Everything about geodesic domes: how they work, how to
-        build one, and the people who dreamed them up. ${PAGES.length} pages in ${GROUPS.length} sections.</p></header>
-        <div class="wiki-groups">
-          ${GROUPS.map((g) => {
-            const pages = inGroup(g.id);
-            return `<details class="wiki-group" data-group="${g.id}"${this.openGroups.has(g.id) ? ' open' : ''}>
-              <summary>
-                <span class="wg-title">${g.id}<small>${pages.length} pages</small></span>
-                <span class="wg-blurb">${g.blurb}</span>
-                <span class="wg-peek">${pages
-                  .slice(0, 4)
-                  .map((p) => `<i>${p.art()}</i>`)
-                  .join('')}</span>
-              </summary>
-              <div class="wiki-cards">${pages.map((p) => this.card(p)).join('')}</div>
-            </details>`;
-          }).join('')}
-        </div>`;
+        build one, and the people who dreamed them up.</p></header>
+        ${MAIN_GROUPS.map(
+          (g) => `<h2 class="group">${g}</h2><div class="wiki-cards">${MAIN.filter((p) => p.group === g)
+            .map((p) => this.card(p))
+            .join('')}</div>`,
+        ).join('')}
+        <details class="wiki-group more-info wiki-more"${this.moreOpen ? ' open' : ''}>
+          <summary>
+            <span class="more-title">More info</span>
+            <span class="more-blurb">${MORE.length} deeper pages: coverings, foundations, doors, dome types, notable domes, glossary, chord charts and more</span>
+          </summary>
+          <div class="more-lists">
+            ${MORE_GROUPS.map((g) => {
+              const pages = MORE.filter((p) => p.group === g);
+              return pages.length
+                ? `<div><h4>${MORE_LABEL[g] ?? g}</h4>${pages
+                    .map((p) => `<a href="#/wiki/${p.slug}"><b>${p.title}</b><span>${p.teaser}</span></a>`)
+                    .join('')}</div>`
+                : '';
+            }).join('')}
+          </div>
+        </details>`;
     }
     const i = PAGES.indexOf(page);
     const prev = PAGES[i - 1];
     const next = PAGES[i + 1];
     const related = (page.related ?? []).map(pageBySlug).filter((p): p is WikiPage => !!p);
-    return `<header class="wiki-head"><p class="crumbs"><a href="#/wiki">Dome Wiki</a> / ${page.group}</p><h1>${page.title}</h1></header>
+    return `<header class="wiki-head"><p class="crumbs"><a href="#/wiki">Dome Wiki</a> / ${isMore(page) ? 'More info / ' : ''}${page.group}</p><h1>${page.title}</h1></header>
       <div class="wiki-text">${page.body({ geometries: this.geometries })}</div>
       ${
         related.length
@@ -150,13 +151,10 @@ export class Wiki {
   }
 
   private markNav(slug?: string) {
-    const page = pageBySlug(slug);
-    const group = slug === 'credits' ? 'About' : page?.group;
     for (const a of this.nav.querySelectorAll<HTMLElement>('a[data-slug]')) a.classList.toggle('on', a.dataset.slug === slug);
-    // Only the current page's section stays open; the home page opens the first.
-    for (const d of this.nav.querySelectorAll<HTMLDetailsElement>('.nav-group')) {
-      d.open = d.dataset.group === (group ?? GROUPS[0].id);
-    }
+    // "More info" opens only while you are reading one of its pages.
+    const more = this.nav.querySelector<HTMLDetailsElement>('.nav-more');
+    if (more) more.open = slug === 'credits' || isMore(pageBySlug(slug));
     this.nav.querySelector('.wiki-home')?.classList.toggle('on', !slug);
   }
 
@@ -193,7 +191,7 @@ export class Wiki {
     this.article.innerHTML = this.html(slug);
     this.wire();
     // Content arrives in a quick cascade.
-    this.article.querySelectorAll<HTMLElement>('.wiki-group, .wiki-text > *, .related').forEach((el, k) => {
+    this.article.querySelectorAll<HTMLElement>('.wiki-card, .wiki-more, .wiki-text > *, .related').forEach((el, k) => {
       if (k > 14) return;
       el.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], {
         duration: 420,
@@ -206,22 +204,21 @@ export class Wiki {
 
   /** Per-page behaviour: remembered index groups, animated accordions, glossary filter. */
   private wire() {
-    for (const d of this.article.querySelectorAll<HTMLDetailsElement>('.wiki-group')) {
-      d.addEventListener('toggle', () => {
-        if (d.open) {
-          this.openGroups.add(d.dataset.group!);
-          d.querySelectorAll<HTMLElement>('.wiki-card').forEach((c, k) =>
-            c.animate([{ opacity: 0, transform: 'translateY(12px) scale(.97)' }, { opacity: 1, transform: 'none' }], {
-              duration: 360,
-              delay: k * 40,
-              easing: 'cubic-bezier(.2,.9,.3,1)',
-              fill: 'backwards',
-            }),
-          );
-        } else this.openGroups.delete(d.dataset.group!);
-        writeOpen(this.openGroups);
-      });
-    }
+    const more = this.article.querySelector<HTMLDetailsElement>('.wiki-more');
+    more?.addEventListener('toggle', () => {
+      this.moreOpen = more.open;
+      writeMoreOpen(more.open);
+      if (more.open) {
+        more.querySelectorAll<HTMLElement>('.more-lists a').forEach((a, k) =>
+          a.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], {
+            duration: 300,
+            delay: k * 22,
+            easing: 'ease-out',
+            fill: 'backwards',
+          }),
+        );
+      }
+    });
     for (const d of this.article.querySelectorAll<HTMLDetailsElement>('.acc-item')) {
       d.addEventListener('toggle', () => {
         if (d.open) {

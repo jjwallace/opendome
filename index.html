@@ -59,14 +59,7 @@
 
       <section class="details">
         <div class="card light">
-          <div class="card-head">
-            <h3>Cut list</h3>
-            <div class="exports">
-              <button type="button" data-export="csv">CSV</button>
-              <button type="button" data-export="obj">OBJ</button>
-              <button type="button" data-export="stl">STL</button>
-            </div>
-          </div>
+          <h3>Cut list</h3>
           <table class="cutlist">
             <thead><tr><th></th><th>Qty</th><th>Chord factor</th><th>Length</th><th>Precise</th></tr></thead>
             <tbody id="cutlist"></tbody>
@@ -84,7 +77,6 @@
           <h3>Materials</h3>
           <p class="muted">Costs vary by location.</p>
           <form class="mat-form" id="materials" autocomplete="off">
-            <label>Strut material <select id="m-material"></select></label>
             <label>Stock length <span><input id="m-stock" inputmode="decimal" /> <i data-u></i></span></label>
             <label>Saw kerf <span><input id="m-kerf" inputmode="decimal" /> <i data-u-small></i></span></label>
             <label>Price per stick <span>$ <input id="m-price" inputmode="decimal" value="8.50" /></span></label>
@@ -95,6 +87,11 @@
         </div>
       </section>
 
+      <details class="more-info" id="more-info">
+        <summary>
+          <span class="more-title">More info</span>
+          <span class="more-blurb">Cover panels, base leveling, raising order, capacity, frame weight and downloads</span>
+        </summary>
       <section class="details">
         <div class="card light">
           <h3>Cover panels</h3>
@@ -114,11 +111,22 @@
         </div>
 
         <div class="card light">
-          <h3>Capacity</h3>
-          <p class="muted">Rough guide from the floor area.</p>
+          <h3>Capacity &amp; weight</h3>
+          <p class="muted">Rough guides from the floor area and strut material.</p>
           <div class="capacity" id="capacity"></div>
+          <form class="mat-form weight-form" autocomplete="off">
+            <label>Strut material <select id="m-material"></select></label>
+          </form>
+          <dl class="totals" id="weight-out"></dl>
+          <h4 class="mini">Downloads</h4>
+          <div class="exports">
+            <button type="button" data-export="csv">Cut list CSV</button>
+            <button type="button" data-export="obj">3D model OBJ</button>
+            <button type="button" data-export="stl">3D print STL</button>
+          </div>
         </div>
       </section>
+      </details>
     </main>
     </div>
     <div class="page" id="page-wiki" hidden></div>
