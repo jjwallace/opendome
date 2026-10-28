@@ -10,16 +10,22 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#">
-        <img src="/logo.png" alt="" />
+      <a class="brand" href="#/calc">
+        <img class="sticker" src="/logo.png" alt="OpenDome" />
         <span><b>OpenDome</b> Architecture Calculator</span>
       </a>
-      <div class="units" role="group" aria-label="Units">
+      <nav class="tabs" aria-label="Pages">
+        <a href="#/calc" data-route="calc">Calculator</a>
+        <a href="#/wiki" data-route="wiki">Dome Wiki</a>
+        <span class="tab-ink" aria-hidden="true"></span>
+      </nav>
+      <div class="units" id="units" role="group" aria-label="Units">
         <button data-unit="ft" class="on">ft</button>
         <button data-unit="m">m</button>
       </div>
     </header>
 
+    <div class="page" id="page-calc">
     <main>
       <section class="picker" id="picker" aria-label="Dome types"></section>
 
@@ -81,6 +87,8 @@
         </div>
       </section>
     </main>
+    </div>
+    <div class="page" id="page-wiki" hidden></div>
 
     <footer>
       <span>© 2026 <a href="https://opendome.org">OpenDome</a>. All rights reserved.</span>

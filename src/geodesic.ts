@@ -261,3 +261,39 @@ function cutDome(spec: DomeSpec, sphere: { vertices: Vec3[]; faces: [number, num
     volumeFactor,
   };
 }
+
+/**
+ * One face of the base solid, subdivided, laid flat for diagrams. Edges carry
+ * their strut type (A = shortest) as it appears on the sphere.
+ */
+export function frequencyTriangle(kind: Polyhedron, freq: number) {
+  const base = baseSolid(kind);
+  const [ia, ib, ic] = base.f[0];
+  const [A, B, C] = [base.v[ia], base.v[ib], base.v[ic]];
+  const at = (i: number, j: number): Vec3 =>
+    normalize([
+      A[0] + ((B[0] - A[0]) * i + (C[0] - A[0]) * j) / freq,
+      A[1] + ((B[1] - A[1]) * i + (C[1] - A[1]) * j) / freq,
+      A[2] + ((B[2] - A[2]) * i + (C[2] - A[2]) * j) / freq,
+    ]);
+  // Flat layout: apex on top, i runs down-left, j down-right.
+  const flat = (i: number, j: number): [number, number] => [(j - i) / 2, ((i + j) * Math.sqrt(3)) / 2];
+  const edges: { a: [number, number]; b: [number, number]; length: number }[] = [];
+  for (let i = 0; i < freq; i++) {
+    for (let j = 0; i + j < freq; j++) {
+      const tri: [number, number][] = [[i, j], [i + 1, j], [i, j + 1]];
+      for (let k = 0; k < 3; k++) {
+        const [p, q] = [tri[k], tri[(k + 1) % 3]];
+        edges.push({ a: flat(...p), b: flat(...q), length: len(sub(at(...p), at(...q))) });
+      }
+    }
+  }
+  const distinct: number[] = [];
+  for (const l of edges.map((e) => e.length).sort((x, y) => x - y)) {
+    if (!distinct.length || l - distinct[distinct.length - 1] > 1e-5) distinct.push(l);
+  }
+  return {
+    size: freq,
+    edges: edges.map((e) => ({ ...e, type: distinct.findIndex((d) => Math.abs(d - e.length) <= 1e-5) })),
+  };
+}
