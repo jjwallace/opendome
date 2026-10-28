@@ -475,8 +475,18 @@ footer {
   max-width: 1400px;
   margin: 0 auto;
   padding: 16px 24px 28px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  border-top: 1px solid #2c2c2c;
   color: #777;
   font-size: 12px;
+}
+
+footer a {
+  color: var(--accent);
+  text-decoration: none;
 }
 
 @media (max-width: 1100px) {

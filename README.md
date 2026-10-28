@@ -1,4 +1,4 @@
-# OpenDome Calculator
+# OpenDome Architecture Calculator
 
 Geodesic dome calculator with 3D previews. It continues
 [jjwallace/GeoDomeCalculator](https://github.com/jjwallace/GeoDomeCalculator), which only handled
