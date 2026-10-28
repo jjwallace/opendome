@@ -11,6 +11,7 @@ import {
   stockNeeded,
   valueOf,
 } from './calc';
+import { CAPACITY_FT2, STRUT_MATERIALS, baseShims, courses, cutListCsv, domeObj, domeStl, download, panelTypes } from './analysis';
 import { DOMES } from './domes';
 import { type DomeGeometry, buildDome } from './geodesic';
 import { Wiki } from './wiki';
@@ -176,10 +177,23 @@ const mat = {
   price: $<HTMLInputElement>('m-price'),
   hub: $<HTMLInputElement>('m-hub'),
   cover: $<HTMLInputElement>('m-cover'),
+  material: $<HTMLSelectElement>('m-material'),
 };
+mat.material.innerHTML = STRUT_MATERIALS.map((m) => `<option value="${m.id}">${m.name}</option>`).join('');
+mat.material.value = 'emt-34';
 mat.stock.value = '10';
 mat.kerf.value = '0.125';
 for (const el of Object.values(mat)) el.addEventListener('input', () => update());
+
+for (const b of document.querySelectorAll<HTMLButtonElement>('[data-export]')) {
+  b.addEventListener('click', () => {
+    const g = current();
+    const name = `${g.spec.id}-${fixed(2 * state.radius, 1).replace('.', '_')}${state.unit}`;
+    if (b.dataset.export === 'csv') download(`${name}-cut-list.csv`, cutListCsv(g, state.radius, state.unit), 'text/csv');
+    if (b.dataset.export === 'obj') download(`${name}.obj`, domeObj(g, state.radius, state.unit), 'model/obj');
+    if (b.dataset.export === 'stl') download(`${name}.stl`, domeStl(g, state.radius), 'model/stl');
+  });
+}
 
 const num = (el: HTMLInputElement) => Math.max(0, Number.parseFloat(el.value) || 0);
 const smallUnit = () => (state.unit === 'ft' ? 'in' : 'mm');
@@ -255,9 +269,64 @@ function update(editing?: string) {
        <dt>Struts</dt><dd>$${fixed(strutCost)}</dd>
        <dt>Hub hardware</dt><dd>$${fixed(hubCost)}</dd>
        <dt>Cover (${fixed(surface, 0)} ${u}²)</dt><dd>$${fixed(coverCost)}</dd>
+       <dt>Frame weight</dt><dd>${frameWeight()}</dd>
        <dt class="grand">Total</dt><dd class="grand">$${fixed(strutCost + hubCost + coverCost)}</dd>`
     : `<dt>Longest strut is longer than the stock length.</dt><dd></dd>`;
+
+  function frameWeight() {
+    const m = STRUT_MATERIALS.find((x) => x.id === mat.material.value) ?? STRUT_MATERIALS[0];
+    const feet = u === 'ft' ? totalLength : totalLength * FT_PER_M;
+    const lb = feet * m.lbPerFt;
+    return u === 'ft' ? `${fixed(lb, 0)} lb` : `${fixed(lb * 0.4536, 0)} kg`;
+  }
+  renderPlanning(g, r);
 }
+
+const tag = (label: string) => {
+  const i = label.charCodeAt(0) - 65;
+  return `<span class="tag" style="background:${STRUT_COLORS[i]}">${label}</span>`;
+};
+
+function renderPlanning(g: DomeGeometry, r: number) {
+  const u = state.unit;
+  const panels = panelTypes(g);
+  $('panels').innerHTML = panels
+    .map(
+      (p) => `<tr>
+        <td>${[...p.key].map(tag).join('')}</td>
+        <td>${p.count}</td>
+        <td>${p.sides.map((s) => fixed(s * r)).join(' · ')}</td>
+        <td>${fixed(p.areaFactor * r * r, 1)} ${u}²</td>
+      </tr>`,
+    )
+    .join('');
+  $('panels-total').innerHTML = `<tr><td></td><td>${g.faces.length}</td><td></td><td>${fixed(g.surfaceAreaFactor * r * r, 0)} ${u}²</td></tr>`;
+
+  const shims = baseShims(g);
+  $('shims').innerHTML =
+    shims.length === 1
+      ? `<p class="ok">Flat base: all ${shims[0].hubs} base hubs sit at the same height.</p>`
+      : `<p class="muted">Base hubs sit at ${shims.length} heights. To level the base, raise the lower hubs (shims, blocks or a riser) by:</p>
+        <ul class="hubs">${shims
+          .map((s) => {
+            const raise = (shims[shims.length - 1].lift - s.lift) * r;
+            return `<li><span>${s.hubs} hubs</span><b>${raise > 1e-9 ? `raise ${precise(raise, u)}` : 'highest: no change'}</b></li>`;
+          })
+          .join('')}</ul>`;
+
+  $('courses').innerHTML = courses(g)
+    .map((c) => `<li>${c.map((n, i) => (n ? `<span class="course-item">${n}× ${tag(g.strutTypes[i].label)}</span>` : '')).join('')}</li>`)
+    .join('');
+
+  const floorFt2 = g.floorAreaFactor * r * r * (u === 'ft' ? 1 : FT_PER_M * FT_PER_M);
+  const people = (per: number) => Math.floor(floorFt2 / per);
+  $('capacity').innerHTML = `
+    <div><b>${people(CAPACITY_FT2.standing)}</b>standing</div>
+    <div><b>${people(CAPACITY_FT2.seated)}</b>seated in rows</div>
+    <div><b>${people(CAPACITY_FT2.banquet)}</b>at tables</div>
+    <div><b>${Math.floor(people(CAPACITY_FT2.banquet * 3))}</b>sleeping</div>`;
+}
+
 
 // ---------------------------------------------------------------- transitions
 
