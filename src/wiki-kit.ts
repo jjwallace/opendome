@@ -90,7 +90,7 @@ export function buckyballSvg(width = 160) {
 }
 
 export const img = (file: string, alt: string, caption?: string, cls = '') =>
-  `<figure class="photo ${cls}"><img src="/wiki/${file}" alt="${alt}" loading="lazy" />${caption ? `<figcaption>${caption}</figcaption>` : ''}</figure>`;
+  `<figure class="photo ${cls}"><img src="wiki/${file}" alt="${alt}" loading="lazy" />${caption ? `<figcaption>${caption}</figcaption>` : ''}</figure>`;
 
 // ---------------------------------------------------------------- page shape
 
