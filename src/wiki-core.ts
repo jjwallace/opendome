@@ -8,7 +8,7 @@ export const CORE_PAGES: WikiPage[] = [
     title: 'Understanding dome frequency',
     teaser: 'What 2V, 3V and 6V mean, and why higher frequencies are rounder.',
     group: 'Learn',
-    art: () => `<img src="/wiki/geodome-frequency2.png" alt="" />`,
+    art: () => `<img src="wiki/geodome-frequency2.png" alt="" />`,
     body: () => `
       <p>Every dome in the calculator starts as a simple solid, usually an <b>icosahedron</b>: twenty equal triangles, the
       shape of a twenty-sided die. That's far too lumpy to live in, so each of its triangles is divided into smaller ones and
@@ -89,7 +89,7 @@ export const CORE_PAGES: WikiPage[] = [
     title: 'Why domes work',
     teaser: 'Strength, wind, light and air: what a sphere does for you.',
     group: 'Learn',
-    art: () => `<img src="/wiki/diagram-advantages.jpg" alt="" />`,
+    art: () => `<img src="wiki/diagram-advantages.jpg" alt="" />`,
     body: () => `
       <p>A triangle cannot change shape without one of its sides changing length, so a frame made only of triangles is
       rigid. In a geodesic dome every load is shared across the whole shell rather than piled onto a few beams, which is why
@@ -129,7 +129,7 @@ export const CORE_PAGES: WikiPage[] = [
     title: 'How to put a dome together',
     teaser: 'From a pile of colour-coded struts to a standing dome.',
     group: 'Build',
-    art: () => `<img src="/wiki/dome.png" alt="" />`,
+    art: () => `<img src="wiki/dome.png" alt="" />`,
     body: () => `
       <ol class="steps">
         <li><b>Plan it.</b> Choose a dome and size in the calculator. Note the cut list, the number of hubs of each kind, and
@@ -155,7 +155,7 @@ export const CORE_PAGES: WikiPage[] = [
     title: 'Assembly methods',
     teaser: 'Bottom-up, top-down, subassemblies and panels.',
     group: 'Build',
-    art: () => `<img src="/wiki/double-dome.png" alt="" />`,
+    art: () => `<img src="wiki/double-dome.png" alt="" />`,
     body: () => `
       <h3>Bottom-up, ring by ring</h3>
       <p>The simplest method, and the one the calculator's animation shows: anchor the base ring and add one course of
@@ -179,7 +179,7 @@ export const CORE_PAGES: WikiPage[] = [
     title: 'Hubs, connectors and materials',
     teaser: 'Flattened conduit, connector hubs, timber, and what each costs you.',
     group: 'Build',
-    art: () => `<img src="/wiki/bolt.png" alt="" />`,
+    art: () => `<img src="wiki/bolt.png" alt="" />`,
     body: () => `
       <p>A hub is where struts meet. Most hubs on an icosahedral dome are <b>6-way</b>. Exactly twelve points on the full sphere,
       the corners of the original icosahedron, are <b>5-way</b>, which is why a hemisphere shows six of them. Hubs on the base
@@ -228,7 +228,7 @@ export const CORE_PAGES: WikiPage[] = [
     title: 'Buckminster Fuller',
     teaser: 'The man who called himself Guinea Pig B and tried to redesign the planet.',
     group: 'History',
-    art: () => `<img src="/wiki/fuller-1972.jpg" alt="" style="object-position: 75% 15%" />`,
+    art: () => `<img src="wiki/fuller-1972.jpg" alt="" style="object-position: 75% 15%" />`,
     body: () => `
       ${img('fuller-1972.jpg', 'R. Buckminster Fuller in 1972, holding a tensegrity model', 'Fuller in 1972, holding a tensegrity model and looking, as usual, like he had just worked something out.', 'float')}
       <p class="lede">Every so often the universe produces a person who looks at the whole arrangement (planets, houses, cars,
@@ -329,7 +329,7 @@ export const CORE_PAGES: WikiPage[] = [
     title: 'A short history of domes',
     teaser: 'From a 1920s planetarium to the South Pole and Epcot.',
     group: 'History',
-    art: () => `<img src="/wiki/biosphere-montreal.jpg" alt="" />`,
+    art: () => `<img src="wiki/biosphere-montreal.jpg" alt="" />`,
     body: () => `
       <ol class="timeline">
         <li><b>1920s</b> Walther Bauersfeld designs a geodesic-patterned dome for the Zeiss planetarium in Jena, Germany,

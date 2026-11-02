@@ -130,7 +130,7 @@ export const EXTRA_PAGES: WikiPage[] = [
     group: 'Build',
     related: ['hubs', 'tools', 'assembly'],
     keywords: 'conduit emt flatten drill jig bend colour code tape',
-    art: () => `<img src="/wiki/pipe.png" alt="" />`,
+    art: () => `<img src="wiki/pipe.png" alt="" />`,
     body: () => `
       <p>A 3V dome has 165 struts. Building them is a production job, and a little jig-making up front saves hours.</p>
       ${accordion([
@@ -150,7 +150,7 @@ export const EXTRA_PAGES: WikiPage[] = [
     group: 'Build',
     related: ['making-struts', 'assembly'],
     keywords: 'saw drill press vice ladder scaffold',
-    art: () => `<img src="/wiki/bolt.png" alt="" />`,
+    art: () => `<img src="wiki/bolt.png" alt="" />`,
     body: () => accordion([
       { title: 'The basics', open: true, body: '<ul><li>Tape measure and marker</li><li>Pipe cutter or chop saw</li><li>Drill and bits for your bolt size</li><li>Vice or press for flattening ends</li><li>Spanners or a socket set</li><li>Coloured tape</li></ul>' },
       { title: 'Worth having', body: '<ul><li>Drill press for repeatable holes</li><li>Cutting and drilling jigs</li><li>Bench grinder for burrs</li><li>Impact driver</li></ul>' },
@@ -231,7 +231,7 @@ export const EXTRA_PAGES: WikiPage[] = [
     group: 'Dome types',
     related: ['coverings', 'largest', 'eden'],
     keywords: 'greenhouse pool glamping hotel glass earth straw bale bamboo hexayurt yurt pillow radome event festival',
-    art: () => `<img src="/wiki/dome.png" alt="" />`,
+    art: () => `<img src="wiki/dome.png" alt="" />`,
     body: () => accordion([
       { title: 'Greenhouses', open: true, body: '<p>The most popular backyard dome. The shape catches low winter sun, sheds wind and snow, and circulates air evenly. Clear film or polycarbonate covers; a vent at the top.</p>' },
       { title: 'Pool domes', body: '<p>A clear dome over a pool extends the swimming season and keeps debris out. Size it from the pool’s diagonal plus walking room.</p>' },
@@ -254,7 +254,7 @@ export const EXTRA_PAGES: WikiPage[] = [
     group: 'History',
     related: ['history', 'eden', 'fuller'],
     keywords: 'biggest largest world record nagoya tacoma climatron biosphere epcot',
-    art: () => `<img src="/wiki/spaceship-earth.jpg" alt="" />`,
+    art: () => `<img src="wiki/spaceship-earth.jpg" alt="" />`,
     body: () => `
       <table class="compare">
         <thead><tr><th>Dome</th><th>Place</th><th>Opened</th><th>Diameter</th></tr></thead>
@@ -331,7 +331,7 @@ export const EXTRA_PAGES: WikiPage[] = [
     group: 'History',
     related: ['fuller', 'platonic'],
     keywords: 'tensegrity snelson synergetics dymaxion map ephemeralization',
-    art: () => `<img src="/wiki/fuller-teaching-1953.jpg" alt="" />`,
+    art: () => `<img src="wiki/fuller-teaching-1953.jpg" alt="" />`,
     body: () => accordion([
       { title: 'Tensegrity', open: true, body: '<p>Fuller coined the word from <i>tensional integrity</i>: rods that never touch one another, held in place by a continuous net of cables. His student Kenneth Snelson made the first famous tensegrity sculptures, starting in the late 1940s. The idea now turns up in engineering, robotics and models of living cells.</p>' },
       { title: 'Synergetics', body: '<p>Fuller’s two-volume attempt to rebuild geometry around the tetrahedron and around how nature actually builds, rather than around cubes and right angles. Dense, strange and full of ideas.</p>' },
